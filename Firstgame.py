@@ -6,8 +6,12 @@ pad_height = 512
 
 
 def Face_load(temp_x,temp_y):
-	global gamepad, clock
+	global gamepad, clock, face_img
 	gamepad.blit(face_img,(temp_x,temp_y))
+
+def BackGround_load(temp_x,temp_y):
+	global gamepad, clock, background_img
+	gamepad.blit(background_img,(temp_x,temp_y))
 def runGame():
 	global gamepad, clock
 	face_x = pad_width*0.05
@@ -36,7 +40,7 @@ def runGame():
 					face_x_change=0
 					face_y_change=0
 		
-		gamepad.fill(WHITE)
+		BackGround_load(0,0)
 		face_x+=face_x_change
 		face_y+=face_y_change
 		Face_load(face_x,face_y)
@@ -46,11 +50,12 @@ def runGame():
 	pygame.quit()
 	quit()
 def initGame():
-	global gamepad, clock, face_img
+	global gamepad, clock, face_img, background_img
 	pygame.init()
 	gamepad=pygame.display.set_mode((pad_width,pad_height))
 	pygame.display.set_caption("Circler");
-	face_img=pygame.image.load("image/face.jpg")
+	face_img=pygame.image.load("image/jolla.png")
+	background_img=pygame.image.load("image/background.png")
 	pygame.mixer.music.load("music/Fuck.mp3")
 	pygame.mixer.music.play(0,0.0)
 	
