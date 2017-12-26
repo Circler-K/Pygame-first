@@ -8,21 +8,22 @@ pad_height = 512
 
 
 def drawObject(obj,temp_x,temp_y):
-	global gamepad, clock, JollaMan_img, background_img, bat_img,bullet_img
+	global gamepad
 	gamepad.blit(obj,(temp_x,temp_y))
 
 def runGame():
 	global gamepad, clock, JollaMan_img, background_img, bat_img, bullet_img
-	JollaMan_x = pad_width*0.05
-	JollaMan_y = pad_height*0.8
+	JollaMan_x = 0
+	JollaMan_y = 0
 	JollaMan_x_change = 0
 	JollaMan_y_change = 0
 	
-	bat_x =  pad_width
+	bat_x = pad_width
 	bat_y = random.randrange(0,pad_height)
 	
 	bullet_xy = []
 	
+	isStriked = False
 	crashed = False
 	while not crashed:
 		for event in pygame.event.get():
@@ -40,16 +41,20 @@ def runGame():
 				elif event.key == pygame.K_RIGHT:
 					JollaMan_x_change += 5
 				elif event.key == pygame.K_LCTRL:
-					bullet_x = JollaMan_x
-					bullet_y = JollaMan_y
+					bullet_x = JollaMan_x+60
+					bullet_y = JollaMan_y +85
 					bullet_xy.append([bullet_x,bullet_y])
-					print(bullet_xy)
 				elif event.key == pygame.K_SPACE:
-					sleep(5)
+					sleep(1)
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_UP or event.key == pygame.K_DOWN or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					JollaMan_x_change=0
 					JollaMan_y_change=0
+		
+		
+		#게임패드 그리기
+		gamepad.fill(WHITE)
+		drawObject(background_img,0,0)
 		
 		
 		#박쥐 그리기
@@ -57,32 +62,46 @@ def runGame():
 		if bat_x <=0:
 			bat_x = pad_width
 			bat_y = random.randrange(0,pad_height)
-		drawObject(bat_img,bat_x,bat_y)
 		
 		#총알 계산
 		if len(bullet_xy)!=0:
 			for i,bxy in enumerate(bullet_xy):
 				bxy[0]+=15
 				bullet_xy[i][0] = bxy[0]
+				if bxy[0] > bat_x:
+					if bxy[1] > bat_y and bxy[1] <= bat_y+75:
+						bullet_xy.remove(bxy)
+						isStriked = True
+				drawObject(bullet_img,bxy[0],bxy[1])
 				if bxy[0]>= pad_width:
 					bullet_xy.remove(bxy)
 		
-		
-		#게임패드 그리기
-		gamepad.fill(WHITE)
-		drawObject(background_img,0,0)
 		
 		#졸라맨 그리기
 		JollaMan_x+=JollaMan_x_change
 		JollaMan_y+=JollaMan_y_change
 		drawObject(JollaMan_img,JollaMan_x,JollaMan_y)
-		pygame.display.update()
-		clock.tick(100)
+		
+		
+		clock.tick(60)
+		
 		
 		#총알 그리기
 		if len(bullet_xy)!=0:
 			for bx,by in bullet_xy:
 				drawObject(bullet_img,bx,by)
+		# 총알 충돌
+		if not isStriked:
+			drawObject(bat_img,bat_x,bat_y)
+		else:
+			bat_x = pad_width
+			bat_y = random.randrange(0,pad_height)
+			isStriked = False
+				
+		#디스플레이 업데이트!, 항상 마지막에		
+		pygame.display.update()
+		
+		
 	pygame.quit()
 	quit()
 	
